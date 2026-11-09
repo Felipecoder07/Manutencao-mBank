@@ -35,7 +35,7 @@
     </head>
     <body>
         {# Navigation Bar #}
-        <div class="navbar navbar-default navbar-static-top" role="navigation">
+        <nav class="navbar navbar-default navbar-static-top">
             <div class="container">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -93,7 +93,7 @@
                     </ul>
                 </div>
             </div>
-        </div>
+        </nav>
 
         {# Page Contents #}
         <div class="container">
@@ -129,7 +129,7 @@
         </div>
 
         {% block scripts %}
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
         {% endblock %}
 
         {% bootstrap_javascript %}

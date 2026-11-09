@@ -12,7 +12,11 @@
   - [1.2. Inclusão de `<title>` na Página de Redirecionamento Swagger (`Web:PageWithoutTitleCheck`)](#12-inclusão-de-title-na-página-de-redirecionamento-swagger-webpagewithouttitlecheck)
   - [1.3. Ocultação de SVG Decorativo para Tecnologias Assistivas (`Web:ImgWithoutAltCheck`)](#13-ocultação-de-svg-decorativo-para-tecnologias-assistivas-webimgwithoutaltcheck)
   - [1.4. Remoção de Código Comentado Inativo (`python:S125`)](#14-remoção-de-código-comentado-inativo-pythons125)
-- [Lote 2: Backend e Boas Práticas Python / Django](#lote-2-backend-e-boas-práticas-python--django) *(Próximo)*
+- [Lote 2: Backend e Boas Práticas Python / Django](#lote-2-backend-e-boas-práticas-python--django)
+  - [2.1. Substituição de `null=True` por `blank=True` em Campo de Texto (`python:S6553`)](#21-substituição-de-nulltrue-por-blanktrue-em-campo-de-texto-pythons6553)
+  - [2.2. Eliminação de Literais Duplicados com Constantes (`python:S1192`)](#22-eliminação-de-literais-duplicados-com-constantes-pythons1192)
+  - [2.3. Substituição de `role="navigation"` por Elemento Semântico `<nav>` (`Web:S6819`)](#23-substituição-de-rolenavigation-por-elemento-semântico-nav-webs6819)
+  - [2.4. Adição de Subresource Integrity (SRI) em Script CDN (`Web:S5725`)](#24-adição-de-subresource-integrity-sri-em-script-cdn-webs5725)
 - [Lote 3: Segurança e Variáveis de Ambiente](#lote-3-segurança-e-variáveis-de-ambiente) *(Planejado)*
 - [Lote 4: Acessibilidade Completa dos Templates Web](#lote-4-acessibilidade-completa-dos-templates-web) *(Planejado)*
 
@@ -208,3 +212,120 @@ class TransactionViewSet(viewsets.ViewSet):
 
 class TransactionViewSet(viewsets.ViewSet):
 ```
+
+---
+
+## Lote 2: Backend e Boas Práticas Python / Django
+
+### 2.1. Substituição de `null=True` por `blank=True` em Campo de Texto (`python:S6553`)
+* **Severidade:** MAJOR (Code Smell)
+* **Arquivo:** [`Manutencao-mBank-main/dbank_project/dbank/account/models.py`](file:///c:/Users/Mateus/Downloads/Manutencao-mBank-main%20(1)/Manutencao-mBank-main/dbank_project/dbank/account/models.py)
+
+#### 🔍 Diagnóstico e Justificativa Técnica
+Na documentação e convenção oficial do Django, não se deve usar `null=True` em campos baseados em caracteres (`CharField`, `TextField`), pois isso gera dois estados "vazios" diferentes no banco de dados: `NULL` (nulo SQL) e `""` (string vazia). A boa prática estabelecida pelo framework e exigida pelo SonarCloud é utilizar apenas `blank=True`, garantindo que dados ausentes sejam sempre armazenados como strings vazias de maneira consistente.
+
+#### 🔴 Antes
+```python
+class Client(AbstractUser):
+    name = models.CharField('clients name', max_length=128, null=False)
+    phone_number = models.CharField('phone number', max_length=64, null=True)
+```
+
+#### 🟢 Depois
+```python
+class Client(AbstractUser):
+    name = models.CharField('clients name', max_length=128, null=False)
+    phone_number = models.CharField('phone number', max_length=64, blank=True)
+```
+
+---
+
+### 2.2. Eliminação de Literais Duplicados com Constantes (`python:S1192`)
+* **Severidade:** CRITICAL (Code Smell)
+* **Arquivo:** [`Manutencao-mBank-main/dbank_project/dbank/account/admin.py`](file:///c:/Users/Mateus/Downloads/Manutencao-mBank-main%20(1)/Manutencao-mBank-main/dbank_project/dbank/account/admin.py)
+
+#### 🔍 Diagnóstico e Justificativa Técnica
+A repetição de strings literais (`'admin:{}_{}_change'` repetida 3 vezes e `'<a href="{}">{}</a>'` repetida 5 vezes) fere o princípio DRY (*Don't Repeat Yourself*). Se for necessário alterar o padrão de formatação ou de URL em um refactoring futuro, ter literais espalhados aumenta o risco de esquecimento ou erro de digitação. A solução é declarar constantes descritivas no módulo.
+
+#### 🔴 Antes
+```python
+    def get_owner_name(self, obj):
+        ct = obj.owner._meta  # content type
+        url = reverse('admin:{}_{}_change'.format(ct.app_label, ct.model_name), args=(obj.owner.pk,))
+        return format_html('<a href="{}">{}</a>', url, obj.owner.name)
+
+    def nr_of_transactions(self, obj):
+        # ...
+        return format_html('<a href="{}">{}</a>', url, transactions.count())
+
+    def get_src(self, obj):
+        # ...
+        url = reverse('admin:{}_{}_change'.format(ct.app_label, ct.model_name), args=(obj.src.pk,))
+        return format_html('<a href="{}">{}</a>', url, obj.src.iban)
+
+    def get_dest(self, obj):
+        # ...
+        url = reverse('admin:{}_{}_change'.format(ct.app_label, ct.model_name), args=(obj.dest.pk,))
+        return format_html('<a href="{}">{}</a>', url, obj.dest.iban)
+
+    def list_accounts(self, obj):
+        # ...
+        return format_html('<a href="{}">{}</a>', url, accounts)
+```
+
+#### 🟢 Depois
+```python
+CHANGE_URL_PATTERN = 'admin:{}_{}_change'
+HTML_LINK_TEMPLATE = '<a href="{}">{}</a>'
+
+# Uso nos métodos:
+url = reverse(CHANGE_URL_PATTERN.format(ct.app_label, ct.model_name), args=(...))
+return format_html(HTML_LINK_TEMPLATE, url, ...)
+```
+
+---
+
+### 2.3. Substituição de `role="navigation"` por Elemento Semântico `<nav>` (`Web:S6819`)
+* **Severidade:** MAJOR (Code Smell)
+* **Arquivo:** [`Manutencao-mBank-main/dbank_project/dbank/templates/base.html`](file:///c:/Users/Mateus/Downloads/Manutencao-mBank-main%20(1)/Manutencao-mBank-main/dbank_project/dbank/templates/base.html)
+
+#### 🔍 Diagnóstico e Justificativa Técnica
+A regra WAI-ARIA recomenda a utilização de elementos nativos do HTML5 sempre que possível em vez de aplicar atributos `role` em elementos genéricos como `<div>`. Substituir `<div role="navigation">` pela tag semântica nativa `<nav>` melhora o suporte nativo em todos os navegadores e ferramentas assistivas sem necessidade de papéis ARIA artificiais.
+
+#### 🔴 Antes
+```html
+<div class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="container">
+        ...
+    </div>
+</div>
+```
+
+#### 🟢 Depois
+```html
+<nav class="navbar navbar-default navbar-static-top">
+    <div class="container">
+        ...
+    </div>
+</nav>
+```
+
+---
+
+### 2.4. Adição de Subresource Integrity (SRI) em Script CDN (`Web:S5725`)
+* **Severidade:** MINOR (Vulnerability)
+* **Arquivo:** [`Manutencao-mBank-main/dbank_project/dbank/templates/base.html`](file:///c:/Users/Mateus/Downloads/Manutencao-mBank-main%20(1)/Manutencao-mBank-main/dbank_project/dbank/templates/base.html)
+
+#### 🔍 Diagnóstico e Justificativa Técnica
+A inclusão de recursos JavaScript de CDNs externas sem os atributos `integrity` e `crossorigin="anonymous"` expõe a aplicação a ataques de *supply chain* ou comprometimento de CDN. Se o arquivo hospedado na CDN for adulterado por invasores, o navegador executaria o script malicioso. O hash criptográfico (SRI) garante que o navegador só executa o script se ele for exatamente idêntico ao esperado.
+
+#### 🔴 Antes
+```html
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+```
+
+#### 🟢 Depois
+```html
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+```
+

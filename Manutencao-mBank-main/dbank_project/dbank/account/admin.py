@@ -6,6 +6,9 @@ from django.utils.html import format_html
 
 from account.models import Client, Account, Transaction
 
+CHANGE_URL_PATTERN = 'admin:{}_{}_change'
+HTML_LINK_TEMPLATE = '<a href="{}">{}</a>'
+
 
 class AdminAccout(admin.ModelAdmin):
     list_display = ('iban', 'created', 'balance', 'get_owner_name', 'is_open', 'nr_of_transactions')
@@ -14,8 +17,8 @@ class AdminAccout(admin.ModelAdmin):
 
     def get_owner_name(self, obj):
         ct = obj.owner._meta  # content type
-        url = reverse('admin:{}_{}_change'.format(ct.app_label, ct.model_name), args=(obj.owner.pk,))
-        return format_html('<a href="{}">{}</a>', url, obj.owner.name)
+        url = reverse(CHANGE_URL_PATTERN.format(ct.app_label, ct.model_name), args=(obj.owner.pk,))
+        return format_html(HTML_LINK_TEMPLATE, url, obj.owner.name)
 
     get_owner_name.short_description = 'owner'
 
@@ -25,7 +28,7 @@ class AdminAccout(admin.ModelAdmin):
         if transactions.count() == 0:
             return '0'
         url = '/admin/account/transaction/?pk__in={}'.format(str(list(transactions))[1:-1])
-        return format_html('<a href="{}">{}</a>', url, transactions.count())
+        return format_html(HTML_LINK_TEMPLATE, url, transactions.count())
 
     nr_of_transactions.short_description = 'Transactions'
 
@@ -49,8 +52,8 @@ class AdminTransaction(admin.ModelAdmin):
         if obj.src is None:
             return None
         ct = obj.src._meta  # content type
-        url = reverse('admin:{}_{}_change'.format(ct.app_label, ct.model_name), args=(obj.src.pk,))
-        return format_html('<a href="{}">{}</a>', url, obj.src.iban)
+        url = reverse(CHANGE_URL_PATTERN.format(ct.app_label, ct.model_name), args=(obj.src.pk,))
+        return format_html(HTML_LINK_TEMPLATE, url, obj.src.iban)
 
     get_src.short_description = 'Source'
 
@@ -58,8 +61,8 @@ class AdminTransaction(admin.ModelAdmin):
         if obj.dest is None:
             return None
         ct = obj.dest._meta  # content type
-        url = reverse('admin:{}_{}_change'.format(ct.app_label, ct.model_name), args=(obj.dest.pk,))
-        return format_html('<a href="{}">{}</a>', url, obj.dest.iban)
+        url = reverse(CHANGE_URL_PATTERN.format(ct.app_label, ct.model_name), args=(obj.dest.pk,))
+        return format_html(HTML_LINK_TEMPLATE, url, obj.dest.iban)
 
     get_dest.short_description = 'Destination'
 
@@ -73,7 +76,7 @@ class AdminClient(admin.ModelAdmin):
             return '0'
 
         url = '/admin/account/account/?owner__id__exact={}'.format(obj.id)
-        return format_html('<a href="{}">{}</a>', url, accounts)
+        return format_html(HTML_LINK_TEMPLATE, url, accounts)
 
     list_accounts.short_description = 'Accounts'
 

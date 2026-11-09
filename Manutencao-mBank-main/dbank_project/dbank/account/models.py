@@ -8,7 +8,7 @@ from django.db import models
 
 class Client(AbstractUser):
     name = models.CharField('clients name', max_length=128, null=False)
-    phone_number = models.CharField('phone number', max_length=64, null=True)
+    phone_number = models.CharField('phone number', max_length=64, blank=True)
 
     def __str__(self):
         return '{}: {}'.format(self.id, self.name)
