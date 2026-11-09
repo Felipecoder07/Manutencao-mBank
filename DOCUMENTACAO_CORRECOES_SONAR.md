@@ -1,5 +1,215 @@
 # Diário de Correções e Manutenção de Código (SonarCloud)
 
+## Lote 4: Acessibilidade dos Templates Web
+
+### 4.1. Estrutura explícita dos breadcrumbs
+
+**Regra/severidade:** `Web:ItemTagNotWithinContainerTagCheck` — MINOR.
+**Arquivos:** `templates/account/account_list.html`, `client_detail.html`,
+`client_list.html` e `transaction_list.html`.
+
+**Diagnóstico:** os `<li>` dos templates filhos já recebiam um `<ol>` de
+`base.html`. O alerta nos fragmentos não demonstrava erro no HTML final. Adicionar
+outra lista dentro do bloco antigo criaria aninhamento incorreto.
+
+**🔴 Antes (contas):**
+```html
+{% block breadcrumbs %}
+    <li><a href="{% url 'bank:accounts_list' %}">Accounts</a></li>
+{% endblock %}
+```
+
+**🟢 Depois:**
+```html
+{% block breadcrumbs_container %}
+    <nav aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'bank:accounts_list' %}" aria-current="page">Accounts</a></li>
+        </ol>
+    </nav>
+{% endblock %}
+```
+
+**Justificativa:** substituir o contêiner inteiro torna a lista explícita nos quatro
+arquivos sem duplicar o contêiner herdado. Preservados Home, os itens intermediários
+e os destinos. Adicionados nome acessível e indicação da página atual. Na lista de
+transações filtrada por conta, o link para todas as transações não recebe
+`aria-current`, pois aponta para outra página.
+
+### 4.2. Links com semântica nativa
+
+**Regras/severidades:** `Web:S6819` — MAJOR;
+`Web:MouseEventWithoutKeyboardEquivalentCheck` — MINOR.
+**Arquivos:** `templates/homepage.html`, `templates/account/account_list.html`
+e `templates/account/transaction_list.html`.
+
+**Diagnóstico:** sete links de navegação eram anunciados como botões pelo atributo
+`role="button"`, criando uma expectativa de interação diferente da de links.
+
+**🔴 Antes:**
+```html
+<a class="btn btn-primary" href="{% url 'bank:transactions_create' %}" role="button">Make Transaction</a>
+<a class="btn btn-default" href="#" role="button">View details &raquo;</a>
+```
+
+**🟢 Depois:**
+```html
+<a class="btn btn-primary" href="{% url 'bank:transactions_create' %}">Make Transaction</a>
+<a class="btn btn-default" href="#">View details &raquo;</a>
+```
+
+**Justificativa:** links com `href` têm foco por Tab e ativação por Enter nativos.
+Remover o papel incorreto preserva destinos e classes Bootstrap sem adicionar
+handlers de teclado artificiais. Os quatro links demonstrativos da homepage
+continuam com `href="#"`; esta correção não cria conteúdo ou novos destinos.
+
+### 4.3. Navegação para ações de conta
+
+**Regra/severidade:** `Web:S6819` — MAJOR.
+**Arquivo:** `templates/account/account_list.html`.
+
+**Diagnóstico:** links agrupados em `div` com `role="group"` e nome acessível
+não descritivo (`...`).
+
+**🔴 Antes:**
+```html
+<div class="btn-group" role="group" aria-label="...">
+    <!-- Links de criação de conta e transação -->
+</div>
+```
+
+**🟢 Depois:**
+```html
+<nav class="btn-group" aria-label="Account actions">
+    <a class="btn btn-primary" href="{% url 'bank:accounts_create' %}">New Account</a>
+    <a class="btn btn-primary" href="{% url 'bank:transactions_create' %}">Make Transaction</a>
+</nav>
+```
+
+**Justificativa:** o conjunto leva a outras páginas e passa a usar navegação
+semântica nativa com nome descritivo. Mantida a classe visual `btn-group`.
+
+### Validação do lote 4
+
+- Três testes aprovados, incluindo renderização de oito páginas; Django sem erros.
+- Verificação dos cinco templates renderizados com `HTMLParser`: tags balanceadas,
+  `<li>` com pai `<ol>` ou `<ul>`, um breadcrumb por página, sem listas de breadcrumb
+  aninhadas e sem os papéis ARIA removidos.
+- Confirmados os destinos dos links de criação de conta e transação.
+- Reanálise SonarCloud e avaliação interativa com leitor de tela não realizadas;
+  esta validação não representa uma auditoria completa de acessibilidade.
+
+---
+
+## Revisão de regressões após o lote 2
+
+### Ambiente Python e resolução de imports no editor
+
+**Diagnóstico:** nesta sessão, `python` resolvia para o alias de WindowsApps e não
+executava. O Python funcional foi localizado por `uv python find`. Não foi possível
+ler o painel Problemas do editor; portanto, não se atribuem todas as marcações das
+pastas a essa causa. O projeto não tinha configuração de interpretador no workspace.
+
+**Regra/severidade:** configuração do ambiente; sem regra Sonar associada.
+
+**🔴 Antes:** workspace sem caminho explícito para o interpretador e para a raiz
+dos módulos `account` e `dbank`.
+
+**🟢 Depois:** criado o ambiente ignorado pelo Git
+`Manutencao-mBank-main/dbank_project/.venv`, com as versões de `requirements.txt`;
+adicionado `.vscode/settings.json`:
+
+```json
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/Manutencao-mBank-main/dbank_project/.venv/Scripts/python.exe",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/Manutencao-mBank-main/dbank_project/dbank"
+    ]
+}
+```
+
+**Justificativa:** permitir que o editor encontre as dependências e os módulos
+locais sem desativar diagnósticos. Se o VS Code já tiver um interpretador selecionado,
+usar `Python: Select Interpreter` para selecionar esse executável; o valor padrão
+não substitui necessariamente uma seleção anterior. O ambiente virtual é local e
+deve ser recriado em outra máquina a partir de `requirements.txt`.
+
+### Migração complementar do telefone
+
+**Regra/severidade:** complemento da correção `python:S6553` (MAJOR) do lote 2.
+
+**Diagnóstico:** o modelo passou a usar `blank=True`, mas só existia a migração
+inicial com `null=True`. Alterar o modelo não atualiza o esquema do banco.
+Além disso, `blank` controla validação e `null` controla armazenamento; não são
+opções equivalentes. A alteração também permite omitir o telefone nos formulários.
+
+**🔴 Antes:**
+
+```python
+# models.py
+phone_number = models.CharField('phone number', max_length=64, blank=True)
+# Estado registrado em 0001_initial.py
+('phone_number', models.CharField(max_length=64, null=True, verbose_name='phone number'))
+```
+
+**🟢 Depois:** nova migração `0002_normalize_phone_number.py` normaliza os dados
+antes de executar `AlterField`:
+
+```python
+Client.objects.using(schema_editor.connection.alias).filter(
+    phone_number__isnull=True
+).update(phone_number='')
+```
+
+```python
+migrations.AlterField(
+    model_name='client',
+    name='phone_number',
+    field=models.CharField('phone number', max_length=64, blank=True),
+)
+```
+
+**Justificativa:** preservar telefones preenchidos, converter valores ausentes e
+sincronizar o esquema sem reescrever a migração inicial. Reverter a migração permite
+novamente `NULL`, mas não reconstrói a distinção antiga entre `NULL` e string vazia.
+
+### Validação de regressões
+
+**Diagnóstico:** `account/tests.py` continha apenas o esqueleto padrão.
+
+**🔴 Antes:**
+
+```python
+from django.test import TestCase
+
+# Create your tests here.
+```
+
+**🟢 Depois:** testes de renderização de oito páginas, validação de cliente sem
+telefone e migração de registros antigos (telefone nulo e preenchido).
+
+**Justificativa:** verificar comportamento e preservação dos dados além da análise
+estática. Os testes usam banco separado em memória.
+
+**Resultados nesta sessão:** `manage.py check` sem problemas;
+`manage.py makemigrations --check --dry-run` sem alterações pendentes;
+`manage.py test account --verbosity 2` com três testes aprovados, incluindo oito
+subcasos de páginas. Isso não equivale a validar JavaScript no navegador ou a uma
+nova análise do SonarCloud.
+
+Para reproduzir no PowerShell, a partir da raiz do repositório:
+
+```powershell
+cd Manutencao-mBank-main/dbank_project/dbank
+../.venv/Scripts/python.exe manage.py check
+../.venv/Scripts/python.exe manage.py makemigrations --check --dry-run
+../.venv/Scripts/python.exe manage.py test account
+../.venv/Scripts/python.exe manage.py migrate
+```
+
+---
+
 **Projeto:** `Manutencao-mBank`  
 **Objetivo:** Registrar o histórico de melhorias, refatorações e correções de segurança recomendadas pelo SonarCloud, documentando o estado anterior (**Antes**), a alteração realizada (**Depois**) e a justificativa técnica (**Por que foi corrigido**).
 
@@ -18,7 +228,7 @@
   - [2.3. Substituição de `role="navigation"` por Elemento Semântico `<nav>` (`Web:S6819`)](#23-substituição-de-rolenavigation-por-elemento-semântico-nav-webs6819)
   - [2.4. Adição de Subresource Integrity (SRI) em Script CDN (`Web:S5725`)](#24-adição-de-subresource-integrity-sri-em-script-cdn-webs5725)
 - [Lote 3: Segurança e Variáveis de Ambiente](#lote-3-segurança-e-variáveis-de-ambiente) *(Planejado)*
-- [Lote 4: Acessibilidade Completa dos Templates Web](#lote-4-acessibilidade-completa-dos-templates-web) *(Planejado)*
+- [Lote 4: Acessibilidade dos Templates Web](#lote-4-acessibilidade-dos-templates-web) *(Implementado e validado localmente; reanálise SonarCloud pendente)*
 
 ---
 

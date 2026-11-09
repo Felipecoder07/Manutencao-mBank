@@ -2,8 +2,13 @@
 
 {% block title %}List of mBank Clients{% endblock %}
 
-{% block breadcrumbs %}
-    <li><a href="{% url "bank:clients_list" %}">Clients</a></li>
+{% block breadcrumbs_container %}
+    <nav aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'bank:clients_list' %}" aria-current="page">Clients</a></li>
+        </ol>
+    </nav>
 {% endblock %}
 
 {% block content %}

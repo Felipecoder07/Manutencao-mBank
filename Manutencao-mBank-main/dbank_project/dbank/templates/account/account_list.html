@@ -2,8 +2,13 @@
 
 {% block title %}List of mBank Accounts{% endblock %}
 
-{% block breadcrumbs %}
-    <li><a href="{% url "bank:accounts_list" %}">Accounts</a></li>
+{% block breadcrumbs_container %}
+    <nav aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'bank:accounts_list' %}" aria-current="page">Accounts</a></li>
+        </ol>
+    </nav>
 {% endblock %}
 
 {% block content %}
@@ -41,10 +46,10 @@
         </div>
 
         <div class="row text-right">
-            <div class="btn-group" role="group" aria-label="...">
-                <a class="btn btn-primary" href="{% url "bank:accounts_create" %}" role="button">New Account</a>
-                <a class="btn btn-primary" href="{% url "bank:transactions_create" %}" role="button">Make Transaction</a>
-            </div>
+            <nav class="btn-group" aria-label="Account actions">
+                <a class="btn btn-primary" href="{% url 'bank:accounts_create' %}">New Account</a>
+                <a class="btn btn-primary" href="{% url 'bank:transactions_create' %}">Make Transaction</a>
+            </nav>
         </div>
     </div>
 {% endblock %}

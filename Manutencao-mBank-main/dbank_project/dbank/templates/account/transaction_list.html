@@ -2,8 +2,13 @@
 
 {% block title %}List of mBank Transactions{% endblock %}
 
-{% block breadcrumbs %}
-    <li><a href="{% url "bank:transactions_list" %}">Transactions</a></li>
+{% block breadcrumbs_container %}
+    <nav aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'bank:transactions_list' %}"{% if not view.kwargs.account_id %} aria-current="page"{% endif %}>Transactions</a></li>
+        </ol>
+    </nav>
 {% endblock %}
 
 {% block content %}
@@ -41,7 +46,7 @@
         </div>
 
         <div class="row text-right">
-            <a class="btn btn-primary" href="{% url "bank:transactions_create" %}" role="button">Make Transaction</a>
+            <a class="btn btn-primary" href="{% url 'bank:transactions_create' %}">Make Transaction</a>
         </div>
     </div>
 {% endblock %}
