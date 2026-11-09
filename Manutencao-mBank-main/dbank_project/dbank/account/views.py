@@ -95,23 +95,6 @@ class TransactionCreate(LoginRequiredMixin, CreateView):
         return HttpResponseRedirect(self.success_url)
 
 
-# class AccountListAPIView(generics.ListCreateAPIView):
-#     serializer_class = AccountSerializer
-#
-#     def get_queryset(self):
-#         return Account.objects.filter(owner=self.request.user)
-
-
-# class TransactionListAPIView(generics.ListCreateAPIView):
-#     # queryset = Transaction.objects.all()
-#     serializer_class = TransactionSerializer
-#
-#     def get_queryset(self):
-#         q1 = Transaction.objects.filter(src__owner=self.request.user)
-#         q2 = Transaction.objects.filter(dest__owner=self.request.user)
-#         return q1 | q2
-
-
 class TransactionViewSet(viewsets.ViewSet):
     queryset = Transaction.objects.all()
 

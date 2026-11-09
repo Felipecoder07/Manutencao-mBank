@@ -76,10 +76,6 @@ class Account(models.Model):
     def __str__(self):
         return '{} ({}) {}'.format(self.iban, self.owner.name, self.balance)
 
-    # def get_absolute_url(self):
-    #     # from django.urls import reverse
-    #     return reverse('account.views.details', args=[str(self.id)])
-
 
 class Transaction(models.Model):
     timestamp = models.DateTimeField('transaction timestamp', auto_now_add=True)

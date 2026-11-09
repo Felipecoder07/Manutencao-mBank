@@ -11,8 +11,6 @@ class AdminAccout(admin.ModelAdmin):
     list_display = ('iban', 'created', 'balance', 'get_owner_name', 'is_open', 'nr_of_transactions')
     ordering = ('-created',)
     search_fields = ('iban', 'owner__name')
-    # list_filter = ('owner',)
-    # exclude = ('closed', 'balance',)
 
     def get_owner_name(self, obj):
         ct = obj.owner._meta  # content type

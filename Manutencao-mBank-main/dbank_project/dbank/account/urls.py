@@ -18,10 +18,6 @@ account_router.register(r'api/accounts', AccountViewSet)
 urlpatterns = transaction_router.urls + account_router.urls
 
 urlpatterns += [
-    # path('', HomePage.as_view(), name='home'),
-    # path('api/accounts/', AccountListAPIView.as_view(), name='account_list_api'),
-    # path('api/transactions/', TransactionListAPIView.as_view(), name='transaction_list_api'),
-
     path('clients/', ClientListView.as_view(), name='clients_list'),
     re_path(r'^clients/(?P<pk>\d+)$', ClientDetailView.as_view(), name='clients_detail'),
     path('accounts/', AccountListView.as_view(), name='accounts_list'),
