@@ -2,8 +2,8 @@ from django.db import migrations, models
 
 
 def normalize_phone_numbers(apps, schema_editor):
-    Client = apps.get_model('account', 'Client')
-    Client.objects.using(schema_editor.connection.alias).filter(
+    client_model = apps.get_model('account', 'Client')
+    client_model.objects.using(schema_editor.connection.alias).filter(
         phone_number__isnull=True
     ).update(phone_number='')
 

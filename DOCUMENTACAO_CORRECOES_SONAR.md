@@ -1,5 +1,24 @@
 # Diário de Correções e Manutenção de Código (SonarCloud)
 
+## Correção final: nome de variável na migração de telefone
+
+**Issue:** `AaHCkc96_3gdn818-21f` — `python:S117`, MINOR (manutenção).
+**Arquivo:** `account/migrations/0002_normalize_phone_number.py`, linha 5.
+
+**Antes:** a variável local `Client` recebia o modelo histórico retornado por
+`apps.get_model('account', 'Client')` e era usada em `Client.objects`.
+
+**Depois:** renomeada para `client_model`, incluindo o uso em
+`client_model.objects`, seguindo o padrão snake_case exigido pela regra.
+O nome do modelo Django continua `Client`; a lógica, os dados e as operações
+da migração não foram alterados. Não é necessária uma nova migração.
+
+**Validação:** `manage.py test account.tests.PhoneNumberMigrationTests` aprovado
+(1 teste), verificando a normalização de telefones nulos e a preservação dos
+telefones preenchidos. Django sem erros de configuração nos checks do teste.
+Correção local concluída; encerramento da issue depende da próxima análise
+do SonarCloud após o envio.
+
 ## Lote 3: Segurança e variáveis de ambiente
 
 - `secrets:S6687`: removida a chave embutida; `SECRET_KEY` agora é obrigatória
