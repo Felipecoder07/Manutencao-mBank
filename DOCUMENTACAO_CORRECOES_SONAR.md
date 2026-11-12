@@ -1,5 +1,22 @@
 # Diário de Correções e Manutenção de Código (SonarCloud)
 
+## Lote 3: Segurança e variáveis de ambiente
+
+- `secrets:S6687`: removida a chave embutida; `SECRET_KEY` agora é obrigatória
+  no ambiente, com erro explícito quando ausente ou vazia.
+- `python:S4507`: `DEBUG` vem do ambiente e tem padrão `False`.
+- Removida a entrada comentada `account` de `INSTALLED_APPS` (limpeza associada
+  a `python:S125`; ocorrência atual no SonarCloud não confirmada).
+- `githubactions:S7637`: ambas as Actions nos dois workflows foram fixadas por
+  SHA completo, consultado nos repositórios oficiais para as tags v4 e v3.
+- README atualizado com configuração local e orientação de rotação da chave.
+
+Validação: três testes aprovados, check Django sem erros, nenhuma mudança de
+migração, testes de configuração para DEBUG e chave ausente/vazia aprovados.
+A chave antiga permanece no histórico e deve ser substituída nos ambientes
+implantados. Rotação externa e nova análise SonarCloud não foram executadas.
+A contagem exata de issues abertas depende dessa nova análise.
+
 ## Lote 4: Acessibilidade dos Templates Web
 
 ### 4.1. Estrutura explícita dos breadcrumbs
@@ -227,7 +244,7 @@ cd Manutencao-mBank-main/dbank_project/dbank
   - [2.2. Eliminação de Literais Duplicados com Constantes (`python:S1192`)](#22-eliminação-de-literais-duplicados-com-constantes-pythons1192)
   - [2.3. Substituição de `role="navigation"` por Elemento Semântico `<nav>` (`Web:S6819`)](#23-substituição-de-rolenavigation-por-elemento-semântico-nav-webs6819)
   - [2.4. Adição de Subresource Integrity (SRI) em Script CDN (`Web:S5725`)](#24-adição-de-subresource-integrity-sri-em-script-cdn-webs5725)
-- [Lote 3: Segurança e Variáveis de Ambiente](#lote-3-segurança-e-variáveis-de-ambiente) *(Planejado)*
+- [Lote 3: Segurança e Variáveis de Ambiente](#lote-3-segurança-e-variáveis-de-ambiente) *(Implementado e validado localmente; reanálise SonarCloud pendente)*
 - [Lote 4: Acessibilidade dos Templates Web](#lote-4-acessibilidade-dos-templates-web) *(Implementado e validado localmente; reanálise SonarCloud pendente)*
 
 ---

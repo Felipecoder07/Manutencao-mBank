@@ -1,21 +1,25 @@
 name: SonarCloud
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
     types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
 
 jobs:
   sonarcloud:
     name: SonarCloud analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v3
+        uses: SonarSource/sonarcloud-github-action@383f7e52eae3ab0510c3cb0e7d9d150bbaeab838 # v3
         with:
           projectBaseDir: Manutencao-mBank-main/dbank_project
         env:

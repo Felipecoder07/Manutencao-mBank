@@ -1,5 +1,9 @@
 # Relatório de Diagnóstico e Correções do SonarCloud
 
+> Relatório histórico da análise inicial. Não representa a contagem atual de
+> issues abertas. As correções locais estão em `DOCUMENTACAO_CORRECOES_SONAR.md`;
+> o encerramento das ocorrências depende de nova análise do SonarCloud.
+
 **Projeto:** `Manutencao-mBank`  
 **Organização:** `felipecoder07`  
 **Total de Issues Detectadas:** 37  
