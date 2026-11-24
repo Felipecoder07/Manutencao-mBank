@@ -39,12 +39,7 @@ class AdminTransaction(admin.ModelAdmin):
     list_display_links = None
 
     def get_type(self, obj):
-        if obj.src is None:
-            return 'deposit'
-        elif obj.dest is None:
-            return 'withdraw'
-        else:
-            return 'transaction'
+        return obj.get_type()
 
     get_type.short_description = 'Type'
 
@@ -84,3 +79,21 @@ class AdminClient(admin.ModelAdmin):
 admin.site.register(Account, AdminAccout)
 admin.site.register(Transaction, AdminTransaction)
 admin.site.register(Client, AdminClient)
+
+from .models import CreditPolicy, YieldSettings
+
+
+@admin.register(CreditPolicy)
+class CreditPolicyAdmin(admin.ModelAdmin):
+    list_display = ('version', 'monthly_interest_rate', 'is_active', 'effective_from')
+
+
+@admin.register(YieldSettings)
+class YieldSettingsAdmin(admin.ModelAdmin):
+    list_display = ('effective_from', 'cdi_annual_rate', 'cdi_percentage', 'business_days_per_year')
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

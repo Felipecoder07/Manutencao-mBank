@@ -1,0 +1,367 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "mBank - Compras",
+    "version": "1.0"
+  },
+  "schemes": [
+    "https"
+  ],
+  "basePath": "/bank/api/compras",
+  "securityDefinitions": {
+    "basic": {
+      "type": "basic"
+    }
+  },
+  "security": [
+    {
+      "basic": []
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/": {
+      "post": {
+        "summary": "Emitir pedido como estabelecimento autorizado",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reference": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou senha inv?lidos"
+          },
+          "401": {
+            "description": "Autentica??o necess?ria"
+          },
+          "403": {
+            "description": "Exige HTTPS e permiss?o"
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular"
+          },
+          "409": {
+            "description": "Conflito de saldo, estado ou chave"
+          },
+          "503": {
+            "description": "Conta ocupada; repetir a solicita??o"
+          },
+          "201": {
+            "description": "Pedido pendente criado",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reference": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Order"
+            }
+          }
+        ]
+      },
+      "get": {
+        "summary": "Listar compras do titular",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Purchase"
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou senha inv?lidos"
+          },
+          "401": {
+            "description": "Autentica??o necess?ria"
+          },
+          "403": {
+            "description": "Exige HTTPS e permiss?o"
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular"
+          },
+          "409": {
+            "description": "Conflito de saldo, estado ou chave"
+          },
+          "503": {
+            "description": "Conta ocupada; repetir a solicita??o"
+          }
+        }
+      }
+    },
+    "/{reference}/": {
+      "parameters": [
+        {
+          "name": "reference",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "format": "uuid"
+        }
+      ],
+      "get": {
+        "summary": "Revisar compra ou recuperar comprovante",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "$ref": "#/definitions/Purchase"
+            }
+          },
+          "400": {
+            "description": "Dados ou senha inv?lidos"
+          },
+          "401": {
+            "description": "Autentica??o necess?ria"
+          },
+          "403": {
+            "description": "Exige HTTPS e permiss?o"
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular"
+          },
+          "409": {
+            "description": "Conflito de saldo, estado ou chave"
+          },
+          "503": {
+            "description": "Conta ocupada; repetir a solicita??o"
+          }
+        }
+      }
+    },
+    "/{reference}/confirmar/": {
+      "parameters": [
+        {
+          "name": "reference",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "format": "uuid"
+        }
+      ],
+      "post": {
+        "summary": "Confirmar pagamento",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "$ref": "#/definitions/Purchase"
+            }
+          },
+          "400": {
+            "description": "Dados ou senha inv?lidos"
+          },
+          "401": {
+            "description": "Autentica??o necess?ria"
+          },
+          "403": {
+            "description": "Exige HTTPS e permiss?o"
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular"
+          },
+          "409": {
+            "description": "Conflito de saldo, estado ou chave"
+          },
+          "503": {
+            "description": "Conta ocupada; repetir a solicita??o"
+          },
+          "429": {
+            "description": "Bloqueio tempor?rio. retry_at informa a libera??o."
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Confirmation"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "type": "string",
+            "description": "Alternativa ? chave no corpo"
+          }
+        ]
+      }
+    },
+    "/{reference}/cancelar/": {
+      "parameters": [
+        {
+          "name": "reference",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "format": "uuid"
+        }
+      ],
+      "post": {
+        "summary": "Cancelar pedido pendente",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "$ref": "#/definitions/Purchase"
+            }
+          },
+          "400": {
+            "description": "Dados ou senha inv?lidos"
+          },
+          "401": {
+            "description": "Autentica??o necess?ria"
+          },
+          "403": {
+            "description": "Exige HTTPS e permiss?o"
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular"
+          },
+          "409": {
+            "description": "Conflito de saldo, estado ou chave"
+          },
+          "503": {
+            "description": "Conta ocupada; repetir a solicita??o"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Order": {
+      "type": "object",
+      "properties": {
+        "payer_iban": {
+          "type": "string"
+        },
+        "recipient_account_id": {
+          "type": "integer"
+        },
+        "order_reference": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "payer_iban",
+        "recipient_account_id",
+        "order_reference",
+        "amount"
+      ]
+    },
+    "Confirmation": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string",
+          "format": "password"
+        },
+        "idempotency_key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "password"
+      ]
+    },
+    "Receipt": {
+      "type": "object",
+      "properties": {
+        "transaction_id": {
+          "type": "integer"
+        },
+        "paid_at": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "merchant_name": {
+          "type": "string"
+        },
+        "order_reference": {
+          "type": "string"
+        }
+      }
+    },
+    "Purchase": {
+      "type": "object",
+      "properties": {
+        "reference": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "order_reference": {
+          "type": "string"
+        },
+        "merchant_name": {
+          "type": "string"
+        },
+        "payer_account": {
+          "type": "string"
+        },
+        "recipient_account": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "expires_at": {
+          "type": "string"
+        },
+        "receipt": {
+          "$ref": "#/definitions/Receipt"
+        }
+      }
+    }
+  }
+}

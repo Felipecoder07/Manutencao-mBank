@@ -1,0 +1,262 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "mBank ? Simula??o de empr?stimo",
+    "version": "1.0"
+  },
+  "basePath": "/bank/api/emprestimos",
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "basic": {
+      "type": "basic"
+    }
+  },
+  "security": [
+    {
+      "basic": []
+    }
+  ],
+  "paths": {
+    "/config/": {
+      "get": {
+        "summary": "Consultar pol?tica, limite e contas abertas",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string"
+                },
+                "policy_version": {
+                  "type": "string"
+                },
+                "monthly_interest_rate": {
+                  "type": "string"
+                },
+                "annual_effective_rate": {
+                  "type": "string"
+                },
+                "preapproved_limit_available": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "preapproved_limit_total": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "min_amount": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "max_amount": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "min_installments": {
+                  "type": "integer"
+                },
+                "max_installments": {
+                  "type": "integer"
+                },
+                "quick_installments": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                "accounts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "iban": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autentica??o necess?ria"
+          },
+          "503": {
+            "description": "Pol?tica de cr?dito indispon?vel"
+          }
+        }
+      }
+    },
+    "/simular/": {
+      "post": {
+        "summary": "Simular parcelas pela Tabela Price",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "pedido",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "account_id": {
+                  "type": "integer"
+                },
+                "amount": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "installments": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "amount",
+                "installments"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string"
+                },
+                "policy_version": {
+                  "type": "string"
+                },
+                "monthly_interest_rate": {
+                  "type": "string"
+                },
+                "annual_effective_rate": {
+                  "type": "string"
+                },
+                "preapproved_limit_available": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "principal_amount": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "installment_amount": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "last_installment_amount": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "fixed_fee": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "iof_amount": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "total_fees": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "total_interest": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "total_payable": {
+                  "type": "string",
+                  "example": "3000.00"
+                },
+                "installments": {
+                  "type": "integer"
+                },
+                "account_id": {
+                  "type": "integer"
+                },
+                "can_contract": {
+                  "type": "boolean"
+                },
+                "exceeds_limit_message": {
+                  "type": "string"
+                },
+                "has_last_installment_diff": {
+                  "type": "boolean"
+                },
+                "reference_date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "assumptions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "installments_schedule": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "opening_balance": {
+                        "type": "string",
+                        "example": "3000.00"
+                      },
+                      "interest_amount": {
+                        "type": "string",
+                        "example": "3000.00"
+                      },
+                      "amortization_amount": {
+                        "type": "string",
+                        "example": "3000.00"
+                      },
+                      "total_amount": {
+                        "type": "string",
+                        "example": "3000.00"
+                      },
+                      "closing_balance": {
+                        "type": "string",
+                        "example": "3000.00"
+                      },
+                      "number": {
+                        "type": "integer"
+                      },
+                      "due_date": {
+                        "type": "string",
+                        "format": "date"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autentica??o necess?ria"
+          },
+          "503": {
+            "description": "Pol?tica de cr?dito indispon?vel"
+          },
+          "400": {
+            "description": "Valor, prazo ou sele??o de conta inv?lidos"
+          },
+          "404": {
+            "description": "Conta indispon?vel para o titular"
+          }
+        }
+      }
+    }
+  }
+}

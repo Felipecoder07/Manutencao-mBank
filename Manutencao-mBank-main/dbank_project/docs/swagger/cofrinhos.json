@@ -1,0 +1,462 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "mBank - Cofrinhos",
+    "version": "1.0"
+  },
+  "basePath": "/bank/api",
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "basic": {
+      "type": "basic"
+    }
+  },
+  "security": [
+    {
+      "basic": []
+    }
+  ],
+  "paths": {
+    "/cofrinhos/": {
+      "get": {
+        "summary": "Listar objetivos",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "account_id",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "include_archived",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Listar objetivos"
+          },
+          "401": {
+            "description": "Autentica??o necess?ria."
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular."
+          }
+        }
+      },
+      "post": {
+        "summary": "Criar cofrinho",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "category": {
+                  "type": "string"
+                },
+                "icon": {
+                  "type": "string"
+                },
+                "goal_amount": {
+                  "type": "string"
+                },
+                "account_id": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Criar cofrinho"
+          },
+          "400": {
+            "description": "Dados inv?lidos."
+          },
+          "401": {
+            "description": "Autentica??o necess?ria."
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular."
+          },
+          "409": {
+            "description": "Conflito de saldo, estado ou chave."
+          }
+        }
+      }
+    },
+    "/cofrinhos/{cid}/": {
+      "get": {
+        "summary": "Consultar objetivo",
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consultar objetivo"
+          },
+          "401": {
+            "description": "Autentica??o necess?ria."
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular."
+          }
+        }
+      },
+      "patch": {
+        "summary": "Editar objetivo",
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "category": {
+                  "type": "string"
+                },
+                "icon": {
+                  "type": "string"
+                },
+                "goal_amount": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Editar objetivo"
+          },
+          "400": {
+            "description": "Dados inv?lidos."
+          },
+          "401": {
+            "description": "Autentica??o necess?ria."
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular."
+          },
+          "409": {
+            "description": "Conflito de saldo, estado ou chave."
+          }
+        }
+      }
+    },
+    "/cofrinhos/{cid}/guardar/": {
+      "post": {
+        "summary": "Guardar dinheiro",
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "type": "string",
+            "description": "Obrigat?rio se ausente no corpo."
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "example": "70.00"
+                },
+                "idempotency_key": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "amount"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Guardar dinheiro"
+          },
+          "400": {
+            "description": "Dados inv?lidos."
+          },
+          "401": {
+            "description": "Autentica??o necess?ria."
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular."
+          },
+          "409": {
+            "description": "Conflito de saldo, estado ou chave."
+          }
+        }
+      }
+    },
+    "/cofrinhos/{cid}/resgatar/": {
+      "post": {
+        "summary": "Resgatar dinheiro",
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "type": "string",
+            "description": "Obrigat?rio se ausente no corpo."
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "example": "70.00"
+                },
+                "idempotency_key": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "amount"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resgatar dinheiro"
+          },
+          "400": {
+            "description": "Dados inv?lidos."
+          },
+          "401": {
+            "description": "Autentica??o necess?ria."
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular."
+          },
+          "409": {
+            "description": "Conflito de saldo, estado ou chave."
+          }
+        }
+      }
+    },
+    "/cofrinhos/{cid}/arquivar/": {
+      "post": {
+        "summary": "Arquivar objetivo zerado",
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Arquivar objetivo zerado"
+          },
+          "400": {
+            "description": "Dados inv?lidos."
+          },
+          "401": {
+            "description": "Autentica??o necess?ria."
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular."
+          },
+          "409": {
+            "description": "Conflito de saldo, estado ou chave."
+          }
+        }
+      }
+    },
+    "/cofrinhos/{cid}/extrato/": {
+      "get": {
+        "summary": "Consultar movimentos paginados",
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "piggy_bank_id",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consultar movimentos paginados"
+          },
+          "401": {
+            "description": "Autentica??o necess?ria."
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular."
+          }
+        }
+      }
+    },
+    "/cofrinhos/extrato/": {
+      "get": {
+        "summary": "Consultar movimentos paginados",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "piggy_bank_id",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consultar movimentos paginados"
+          },
+          "401": {
+            "description": "Autentica??o necess?ria."
+          },
+          "404": {
+            "description": "Recurso indispon?vel para o titular."
+          }
+        }
+      }
+    },
+    "/cofrinhos/dashboard/": {
+      "get": {
+        "summary": "Resumo dos cofrinhos do titular",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "query",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Objetivos ativos, saldo dispon?vel, total guardado, rendimento do m?s por compet?ncia, pol?tica vigente e hist?rico de 30 dias."
+          },
+          "404": {
+            "description": "Conta indispon?vel."
+          }
+        }
+      }
+    },
+    "/cofrinhos/aplicar-rendimento/": {
+      "post": {
+        "summary": "Processar rendimentos (staff)",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "month": {
+                  "type": "string",
+                  "example": "2025-02"
+                },
+                "preview": {
+                  "type": "boolean",
+                  "default": false
+                }
+              }
+            }
+          }
+        ],
+        "description": "Informe uma compet?ncia di?ria ou um m?s encerrado. Sem per?odo, processa ontem. preview simula sem persistir.",
+        "responses": {
+          "200": {
+            "description": "Retorna preview, credits e total."
+          },
+          "400": {
+            "description": "Per?odo inv?lido ou pol?tica indispon?vel."
+          },
+          "403": {
+            "description": "Apenas staff."
+          }
+        }
+      }
+    }
+  }
+}

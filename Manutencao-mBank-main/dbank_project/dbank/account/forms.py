@@ -1,3 +1,5 @@
+import uuid
+from django import forms
 from django.forms import ModelForm
 
 from account.models import Account, Transaction
@@ -15,6 +17,8 @@ class AccountForm(ModelForm):
 
 
 class TransactionForm(ModelForm):
+    request_key = forms.UUIDField(initial=uuid.uuid4, widget=forms.HiddenInput, required=False)
+
     class Meta:
         model = Transaction
         fields = ['src', 'dest', 'amount']

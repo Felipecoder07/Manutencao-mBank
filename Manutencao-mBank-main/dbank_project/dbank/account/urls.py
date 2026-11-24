@@ -1,6 +1,9 @@
 from django.urls import path, re_path
 from rest_framework.routers import DefaultRouter
 
+from .purchases import PurchaseViewSet
+from .loans import LoanSimulationViewSet
+from .piggy_banks import PiggyBankViewSet
 from .views import (
     ClientListView, ClientDetailView, AccountListView, 
     TransactionListView, AccountCreate, TransactionCreate, 
@@ -14,6 +17,10 @@ transaction_router.register(r'api/transactions', TransactionViewSet)
 
 account_router = DefaultRouter()
 account_router.register(r'api/accounts', AccountViewSet)
+
+account_router.register(r'api/compras', PurchaseViewSet, basename='compra')
+account_router.register(r'api/emprestimos', LoanSimulationViewSet, basename='emprestimo')
+account_router.register(r'api/cofrinhos', PiggyBankViewSet, basename='cofrinho')
 
 urlpatterns = transaction_router.urls + account_router.urls
 

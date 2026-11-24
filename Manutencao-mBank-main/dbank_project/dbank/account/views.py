@@ -4,6 +4,8 @@ from django.db.models import Q
 # Create your views here.
 from django.forms import ModelChoiceField
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, DetailView, ListView, CreateView
 from rest_framework.response import Response
@@ -42,7 +44,7 @@ class TransactionListView(LoginRequiredMixin, ListView):
         ordering = self.get_ordering()
 
         if 'account_id' in self.kwargs:
-            account_id = self.kwargs.get('account_id')
+            account_id = get_object_or_404(Account, pk=self.kwargs['account_id'], owner=self.request.user).pk
             return Transaction.objects.filter(Q(src__id=account_id) | Q(dest__id=account_id)).order_by(*ordering)
         else:
             client = self.request.user
@@ -78,13 +80,14 @@ class TransactionCreate(LoginRequiredMixin, CreateView):
         dest = transaction.dest
         amount = transaction.amount
 
+        request = {'actor': self.request.user, 'key': form.cleaned_data['request_key']}
         try:
             if src and dest:
-                src.transfer(dest, amount)
+                src.transfer(dest, amount, **request)
             elif dest:
-                dest.deposit(amount)
+                dest.deposit(amount, **request)
             elif src:
-                src.withdraw(amount)
+                src.withdraw(amount, **request)
             else:
                 form.add_error(None, 'Choose a source and/or a destination account.')
                 return self.form_invalid(form)
@@ -96,6 +99,7 @@ class TransactionCreate(LoginRequiredMixin, CreateView):
 
 
 class TransactionViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Transaction.objects.all()
 
     def list(self, request, format='json'):
@@ -105,7 +109,7 @@ class TransactionViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        queryset = Transaction.objects.get(id=pk)
+        queryset = get_object_or_404(Transaction, Q(src__owner=request.user) | Q(dest__owner=request.user), pk=pk)
         serializer = TransactionSerializer(queryset)
         return Response(serializer.data)
 

@@ -90,6 +90,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'OPTIONS': {'transaction_mode': 'IMMEDIATE'},
     }
 }
 
@@ -146,3 +147,8 @@ REST_FRAMEWORK = {
    ),
    'PAGE_SIZE': 10
 }
+
+PURCHASE_TTL_SECONDS = int(os.getenv('PURCHASE_TTL_SECONDS', '900'))
+PURCHASE_PASSWORD_MAX_ATTEMPTS = int(os.getenv('PURCHASE_PASSWORD_MAX_ATTEMPTS', '5'))
+PURCHASE_PASSWORD_WINDOW_SECONDS = int(os.getenv('PURCHASE_PASSWORD_WINDOW_SECONDS', '900'))
+PURCHASE_PASSWORD_BLOCK_SECONDS = int(os.getenv('PURCHASE_PASSWORD_BLOCK_SECONDS', '900'))

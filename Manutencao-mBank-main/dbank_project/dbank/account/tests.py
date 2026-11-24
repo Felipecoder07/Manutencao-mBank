@@ -49,4 +49,5 @@ class PhoneNumberMigrationTests(TransactionTestCase):
             self.assertEqual(new_client.objects.get(pk=missing.pk).phone_number, '')
             self.assertEqual(new_client.objects.get(pk=filled.pk).phone_number, '11999999999')
         finally:
-            MigrationExecutor(connection).migrate(current)
+            executor = MigrationExecutor(connection)
+            executor.migrate(executor.loader.graph.leaf_nodes())
